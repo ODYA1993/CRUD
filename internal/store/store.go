@@ -2,33 +2,38 @@ package store
 
 import (
 	"github.com/DmitryOdintsov/awesomeProject/internal/entity"
+	"sync"
 )
 
 type Store struct {
-	Users map[int]*entity.User
+	users map[int]*entity.User
+	id    int
+	sync.Mutex
 }
 
 func NewStore() *Store {
-	return &Store{Users: make(map[int]*entity.User)}
+	return &Store{users: make(map[int]*entity.User)}
 }
 
 func (s *Store) SaveUser(user *entity.User) (*entity.User, error) {
-	id := s.getLastUserId()
+	s.Lock()
+	id := s.incrementId()
 	user.ID = id
-	s.Users[id] = user
+	s.users[id] = user
+	s.Unlock()
 	return user, nil
 }
 
-func (s *Store) getLastUserId() int {
-	return len(s.Users) + 1
+func (s *Store) incrementId() int {
+	s.id += 1
+	return s.id
 }
-
 func (s *Store) GetUsers() map[int]*entity.User {
-	return s.Users
+	return s.users
 }
 
 func (s *Store) GetUserID(id int) (*entity.User, bool) {
-	user, ok := s.Users[id]
+	user, ok := s.users[id]
 	return user, ok
 }
 

@@ -9,12 +9,12 @@ import (
 
 func Run(h *handlers.Handler) {
 	router := chi.NewRouter()
-	router.Post("/create", h.Create)
-	router.Post("/make_friend", h.AddFriends)
-	router.Get("/get", h.GetAll)
-	router.Get("/friends/{id}", h.GetFriend)
-	router.Delete("/delete/{id}", h.DeletePost)
-	router.Put("/put/{id}", h.PutAge)
+	router.Post("/users", h.Create)
+	router.Post("/friends", h.AddFriends)
+	router.Get("/users", h.GetUsers)
+	router.Get("/user/{id}/friends", h.GetFriend)
+	router.Delete("/user/{id}", h.DeleteUser)
+	router.Put("/user/{id}", h.PutAge)
 
 	err := http.ListenAndServe(":8080", router)
 	if err != nil {
