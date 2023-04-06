@@ -20,7 +20,7 @@ func NewHandler(s *service.Service) *Handler {
 	return &Handler{Service: s}
 }
 
-func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) CreateHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	content, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -38,7 +38,8 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userSave, err := h.Service.SaveUser(&user)
+	userSave, err := h.Service.SaveUserService(&user)
+
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte(err.Error()))
@@ -59,7 +60,7 @@ type ID struct {
 	TargetID int `json:"target_id"`
 }
 
-func (h Handler) AddFriends(w http.ResponseWriter, r *http.Request) {
+func (h Handler) AddFriendsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	content, _ := io.ReadAll(r.Body)
 
@@ -70,13 +71,13 @@ func (h Handler) AddFriends(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(err.Error()))
 	}
 
-	sourceUser, ok := h.Service.GetUserID(id.SourceID)
+	sourceUser, ok := h.Service.GetUserIDService(id.SourceID)
 	if !ok {
 		log.Fatal("пользователь не найден")
 		return
 	}
 
-	targetUser, ok := h.Service.GetUserID(id.TargetID)
+	targetUser, ok := h.Service.GetUserIDService(id.TargetID)
 	if !ok {
 		log.Fatal("пользователь не найден")
 		return
@@ -102,14 +103,14 @@ func (h Handler) AddFriends(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusBadRequest)
 }
 
-func (h *Handler) DeleteUser(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	id := chi.URLParam(r, "id")
 	idInt, _ := strconv.Atoi(id)
-	users := h.Service.GetUsers()
+	users := h.Service.GetUsersService()
 
-	userRemote, ok := h.Service.GetUserID(idInt)
+	userRemote, ok := h.Service.GetUserIDService(idInt)
 	if !ok {
 		log.Fatal("пользователя с таким ID нет")
 		return
@@ -138,9 +139,9 @@ func (h *Handler) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusBadRequest)
 }
 
-func (h *Handler) GetUsers(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetUsersHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	users := h.Service.GetUsers()
+	users := h.Service.GetUsersService()
 	userByte, err := json.Marshal(&users)
 	if err != nil {
 		w.Write([]byte(err.Error()))
@@ -156,11 +157,11 @@ func (h *Handler) GetUsers(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusBadRequest)
 }
 
-func (h *Handler) GetFriend(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) GetFriendHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	id := chi.URLParam(r, "id")
 	idInt, _ := strconv.Atoi(id)
-	users, ok := h.Service.GetFriends(idInt)
+	users, ok := h.Service.GetFriendsService(idInt)
 	if !ok {
 		log.Fatal("у этого пользователя нет друзей")
 	}
@@ -178,13 +179,13 @@ func (h *Handler) GetFriend(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusBadRequest)
 }
 
-func (h *Handler) PutAge(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) PutAgeHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	id := chi.URLParam(r, "id")
 	idInt, _ := strconv.Atoi(id)
 	newAge, err := io.ReadAll(r.Body)
 
-	user, _ := h.Service.GetUserID(idInt)
+	user, _ := h.Service.GetUserIDService(idInt)
 	var userInput entity.User
 
 	err = json.Unmarshal(newAge, &userInput)

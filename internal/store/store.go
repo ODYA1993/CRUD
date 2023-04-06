@@ -5,6 +5,13 @@ import (
 	"sync"
 )
 
+type IStore interface {
+	SaveUser(user *entity.User) (*entity.User, error)
+	GetUsers() map[int]*entity.User
+	GetUserID(id int) (*entity.User, bool)
+	GetFriends(id int) ([]*entity.User, bool)
+}
+
 type Store struct {
 	users map[int]*entity.User
 	id    int

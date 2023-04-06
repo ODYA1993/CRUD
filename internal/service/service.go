@@ -6,26 +6,25 @@ import (
 )
 
 type Service struct {
-	Store *store.Store
+	Store store.IStore
 }
 
-func NewService(s *store.Store) *Service {
-	return &Service{Store: s}
+func NewService(s store.IStore) *Service {
+	return &Service{s}
 }
 
-func (s *Service) SaveUser(user *entity.User) (*entity.User, error) {
+func (s *Service) SaveUserService(user *entity.User) (*entity.User, error) {
 	return s.Store.SaveUser(user)
 }
 
-func (s *Service) GetUsers() map[int]*entity.User {
+func (s *Service) GetUsersService() map[int]*entity.User {
 	return s.Store.GetUsers()
 }
 
-func (s *Service) GetUserID(id int) (*entity.User, bool) {
+func (s *Service) GetUserIDService(id int) (*entity.User, bool) {
 	return s.Store.GetUserID(id)
 }
 
-func (s *Service) GetFriends(id int) ([]*entity.User, bool) {
-
+func (s *Service) GetFriendsService(id int) ([]*entity.User, bool) {
 	return s.Store.GetFriends(id)
 }
